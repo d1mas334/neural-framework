@@ -1,9 +1,9 @@
-# Neural Framework (Lua)
+﻿# Neural Framework (Lua)
 
-Лабораторная работа по курсу **"Искусственный интеллект"**  
+Лабораторная работа по курсу "Искусственный интеллект"  
 Тема: **Создание своего нейросетевого фреймворка**
 
-## Команда
+## Состав команды
 
 | ФИО | Роль в проекте | Оценка |
 |---|---|---|
@@ -12,97 +12,114 @@
 | Гин Ку Син | Программировал оптимизаторы |  |
 | Галкина | Писала отчёт |  |
 
-## Что реализовано
+## Цель работы
 
-- Создание многослойной нейросети перечислением слоев (`Network.new({ ... })`).
-- Базовые абстракции фреймворка: `Tensor`, `Layer`, `Network`.
-- Работа с данными: `DataLoader` (`minibatching`, `shuffle`, `map`).
-- Оптимизаторы:
-  - `SGD`
-  - `Momentum SGD`
-  - `Adam`
-- Передаточные функции:
-  - `relu`, `leaky_relu`, `sigmoid`, `tanh`, `softmax`
-- Функции потерь:
-  - `CrossEntropy` (multi-class классификация)
-  - `BinaryCrossEntropy` (binary классификация)
-  - `MSE` (регрессия)
-- Обучение "в несколько строк" через `network:train(...)` или явный train loop в примерах.
+Реализация собственного фреймворка для обучения полносвязных нейросетей с поддержкой:
+
+- построения многослойной сети;
+- загрузки и обработки данных;
+- нескольких оптимизаторов;
+- функций активации и функций потерь;
+- примеров обучения на классических задачах.
+
+## Реализованные компоненты
+
+### 1. Ядро фреймворка (`core`)
+
+- `tensor.lua` — базовые операции над тензорами;
+- `layer.lua` — базовый интерфейс слоя;
+- `network.lua` — последовательная многослойная сеть, `forward/backward`, обновление параметров;
+- `dataloader.lua` — `minibatching`, `shuffle`, `map`, итератор батчей.
+
+### 2. Слои (`layers`)
+
+- `linear.lua` — полносвязный слой;
+- `activation.lua` — `relu`, `leaky_relu`, `sigmoid`, `tanh`, `softmax`;
+- `dropout.lua` — dropout-слой.
+
+### 3. Функции потерь (`losses`)
+
+- `cross_entropy.lua` — многоклассовая классификация;
+- `binary_cross_entropy.lua` — бинарная классификация;
+- `mse.lua` — среднеквадратичная ошибка (регрессия).
+
+### 4. Оптимизаторы (`optimizers`)
+
+- `sgd.lua` — SGD;
+- `momentum.lua` — Momentum SGD;
+- `adam.lua` — Adam.
+
+### 5. Датасеты (`datasets`)
+
+- `mnist.lua` — загрузка реального MNIST (IDX-файлы);
+- `iris.lua` — iris-like датасет для классификации на 3 класса;
+- `generated_vs_real.lua` — загрузка бинарного CSV (`label + признаки`).
+
+### 6. Примеры (`examples`)
+
+- `mnist_example.lua` — обучение MLP на MNIST;
+- `iris_example.lua` — обучение сети на Iris;
+- `generated_vs_real_example.lua` — бинарная классификация real vs generated.
+
+### 7. Утилиты подготовки данных (`tools`)
+
+- `build_generated_vs_real_csv.py` — сборка CSV из папок `real/fake`;
+- `download_defactify_subset.py` — загрузка subset датасета Defactify;
+- `download_cocoai_subset.py` — загрузка subset COCO_AI;
+- `prepare_binary_image_subset.py` — подготовка бинарной выборки из сырой структуры.
+
+## Соответствие пунктам задания
+
+- Создание многослойной нейросети перечислением слоёв — **выполнено**.
+- Набор функций для работы с данными (`map`, minibatching, shuffle) — **выполнено**.
+- Не менее 3 оптимизаторов — **выполнено** (`SGD`, `Momentum`, `Adam`).
+- Передаточные функции и функции потерь для классификации и регрессии — **выполнено**.
+- Обучение нейросети в несколько строк с конфигурированием — **выполнено**.
+- 2-3 примера использования на классических задачах — **выполнено** (`MNIST`, `Iris`, `Generated vs Real`).
+- Документация в `README.md` — **выполнено**.
 
 ## Структура проекта
 
 ```text
-core/         # tensor, network, layer, dataloader
-layers/       # linear, activation, dropout
-losses/       # cross_entropy, binary_cross_entropy, mse
-optimizers/   # sgd, momentum, adam
-datasets/     # mnist, iris, generated_vs_real
-examples/     # mnist_example, iris_example, generated_vs_real_example
-tools/        # утилиты подготовки датасетов
+core/
+layers/
+losses/
+optimizers/
+datasets/
+examples/
+tools/
+data/
+README.md
 ```
 
-## Требования
+## Запуск примеров
 
-- Lua 5.1+ (проверено на Lua 5.1)
-- Для подготовки image-датасетов:
-  - Python 3.9+
-  - пакеты: `pillow`, `datasets`
-
-## Быстрый старт
-
-### 1) MNIST (реальные IDX-файлы)
-
-Ожидаемые файлы в `data/mnist`:
-
-- `train-images-idx3-ubyte`
-- `train-labels-idx1-ubyte`
-- `t10k-images-idx3-ubyte`
-- `t10k-labels-idx1-ubyte`
-
-Запуск:
+### MNIST
 
 ```powershell
 cd D:\GitHub\neural-framework\examples
 lua mnist_example.lua
 ```
 
-### 2) Iris (demo example)
+### Iris
 
 ```powershell
 cd D:\GitHub\neural-framework\examples
 lua iris_example.lua 40 16 0.01
 ```
 
-Аргументы: `epochs batch_size learning_rate`.
+Параметры: `epochs batch_size learning_rate`.
 
-### 3) Generated vs Real (binary classification)
-
-#### Подготовка CSV из папок с картинками
-
-```powershell
-cd D:\GitHub\neural-framework
-python -m pip install pillow datasets
-
-python tools\build_generated_vs_real_csv.py `
-  --real-dir D:\GitHub\neural-framework\data\binary_images\real `
-  --fake-dir D:\GitHub\neural-framework\data\binary_images\fake `
-  --out D:\GitHub\neural-framework\data\generated_vs_real.csv `
-  --size 28 `
-  --max-per-class 2000
-```
-
-Запуск обучения:
+### Generated vs Real
 
 ```powershell
 cd D:\GitHub\neural-framework\examples
 lua generated_vs_real_example.lua ../data/generated_vs_real.csv 12 128 adam
 ```
 
-Аргументы: `csv_path epochs batch_size optimizer_name`.
+Параметры: `csv_path epochs batch_size optimizer`.
 
-## Формат данных для binary classification
-
-`generated_vs_real_example.lua` ожидает CSV:
+## Формат входного CSV для binary classification
 
 ```csv
 label,p1,p2,...,pN
@@ -110,29 +127,16 @@ label,p1,p2,...,pN
 1,0.91,0.07,...
 ```
 
-- `label`: `0` (real), `1` (generated)
-- признаки `p1..pN`: числовые (в проекте это векторизованные пиксели)
+- `label`: `0` — real, `1` — generated.
+- `p1..pN`: числовые признаки.
 
-## Важные замечания
+## Примечание по меткам
 
-- Для `CrossEntropy` используются **индексы классов** (`0..C-1`), не one-hot.
-- Примеры в `examples/` предполагают запуск из директории `examples` (из-за `package.path = "../?.lua;" .. package.path`).
-- Большие датасеты в `data/` в репозитории лучше не коммитить в публичный remote без необходимости.
+Для `CrossEntropy` используются индексы классов (`0..C-1`), без one-hot кодирования.
 
-## Соответствие заданию (кратко)
+## Материалы для защиты
 
-- Многослойная сеть перечислением слоев: **да**
-- Data utils (`map`, minibatch, shuffle): **да**
-- Не менее 3 оптимизаторов: **да** (`SGD`, `Momentum`, `Adam`)
-- Несколько функций активации и потерь для классификации/регрессии: **да**
-- Обучение в несколько строк: **да**
-- 2-3 примера: **да** (`MNIST`, `Iris`, `Generated vs Real`)
-- README: **да**
-
-## Видео (5 минут)
-
-В видео рекомендуется показать:
-
-1. Архитектуру фреймворка (`core`, `layers`, `losses`, `optimizers`).
-2. Короткий запуск `mnist_example.lua` и `iris_example.lua`.
-3. Нестандартный кейс `generated_vs_real_example.lua` (детекция AI-generated изображений).
+- Репозиторий фреймворка с исходным кодом;
+- Примеры запуска (`MNIST`, `Iris`, `Generated vs Real`);
+- Метрики качества из выводов скриптов;
+- Видео-презентация (5 минут).
