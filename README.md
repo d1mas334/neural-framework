@@ -78,6 +78,13 @@
 - 2-3 примера использования на классических задачах — **выполнено** (`MNIST`, `Iris`, `Generated vs Real`).
 - Документация в `README.md` — **выполнено**.
 
+## Особенности проекта
+
+- Проект реализован на языке **Lua** (нестандартный выбор для задач нейросетей).
+- Фреймворк написан с нуля: собственные `Tensor`, `Network`, `DataLoader`, слои, лоссы и оптимизаторы.
+- Помимо классических задач (`MNIST`, `Iris`) добавлен отдельный практический кейс:
+  **бинарная классификация изображений `AI / not AI`** (`generated vs real`).
+
 ## Структура проекта
 
 ```text
@@ -90,6 +97,45 @@ examples/
 tools/
 data/
 README.md
+```
+
+## Пошаговый гайд
+
+### Шаг 1. Установить инструменты
+
+Открыть **PowerShell** и выполнить:
+
+```powershell
+winget install --id Git.Git -e
+winget install --id Lua.Lua -e
+```
+
+Закрыть и заново открыть PowerShell.
+
+Проверить, что всё установилось:
+
+```powershell
+git --version
+lua -v
+```
+
+### Шаг 2. Скачать репозиторий с GitHub
+
+```powershell
+cd D:\
+mkdir GitHub -ErrorAction SilentlyContinue
+cd D:\GitHub
+git clone <URL_ВАШЕГО_REPO_ИЗ_GITHUB_CLASSROOM_ИЛИ_PUBLIC_REPO>
+cd neural-framework
+```
+
+### Шаг 3. Запустить примеры работоспособности
+
+```powershell
+cd D:\GitHub\neural-framework\examples
+lua iris_example.lua 30 16 0.01
+lua mnist_example.lua
+lua generated_vs_real_example.lua ../data/generated_vs_real.csv 12 128 adam
 ```
 
 ## Запуск примеров
@@ -105,7 +151,7 @@ lua mnist_example.lua
 
 ```powershell
 cd D:\GitHub\neural-framework\examples
-lua iris_example.lua 40 16 0.01
+lua iris_example.lua 30 16 0.01
 ```
 
 Параметры: `epochs batch_size learning_rate`.
@@ -133,6 +179,27 @@ label,p1,p2,...,pN
 ## Примечание по меткам
 
 Для `CrossEntropy` используются индексы классов (`0..C-1`), без one-hot кодирования.
+
+## Кратко по датасетам
+
+### MNIST
+
+- Используется реальный набор рукописных цифр (IDX-файлы в `data/mnist`).
+- В примере применяется MLP-сеть и `CrossEntropy` для многоклассовой классификации.
+- Скрипт: `examples/mnist_example.lua`.
+
+### Iris
+
+- Используется iris-like датасет для задачи классификации на 3 класса.
+- В примере используется MLP + `CrossEntropy` + `Adam`.
+- Скрипт: `examples/iris_example.lua`.
+
+### Generated vs Real (AI / not AI)
+
+- Используется бинарный датасет изображений (`real` и `generated`), собранный в CSV-признаки.
+- В примере используется MLP + `BinaryCrossEntropy` + `Adam`.
+- Добавлен практический кейс определения, сгенерировано изображение ИИ или нет.
+- Скрипт: `examples/generated_vs_real_example.lua`.
 
 ## Материалы для защиты
 
